@@ -24,14 +24,11 @@ import org.dasein.cloud.InternalException;
 import org.dasein.cloud.ProviderContext;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
 import org.dasein.cloud.brightbox.NoContextException;
-import org.dasein.cloud.brightbox.dc.DatacenterCapabilities;
+import org.dasein.cloud.brightbox.api.model.Zone;
 import org.dasein.cloud.dc.AbstractDataCenterServices;
 import org.dasein.cloud.dc.DataCenter;
 import org.dasein.cloud.dc.DataCenterCapabilities;
-import org.dasein.cloud.dc.Folder;
 import org.dasein.cloud.dc.Region;
-import org.dasein.cloud.dc.ResourcePool;
-import org.dasein.cloud.dc.StoragePool;
 import org.dasein.cloud.util.APITrace;
 import org.dasein.cloud.util.Cache;
 import org.dasein.cloud.util.CacheLevel;
@@ -43,7 +40,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Locale;
+import java.util.List;
 
 /**
  * Data center services
@@ -51,19 +48,19 @@ import java.util.Locale;
  * @version 2015.03.1 initial version
  * @since 2015.03.1
  */
-public class Datacenters extends AbstractDataCenterServices<BrightBoxCloud> {
-    static private final Logger logger = BrightBoxCloud.getLogger(Datacenters.class);
+public class Zones extends AbstractDataCenterServices<BrightBoxCloud> {
+    static private final Logger logger = BrightBoxCloud.getLogger(Zones.class);
 
-    public Datacenters(@Nonnull BrightBoxCloud provider) {
+    public Zones(@Nonnull BrightBoxCloud provider) {
         super(provider);
     }
 
-    private transient volatile DatacenterCapabilities capabilities;
+    private transient volatile ZonesCapabilities capabilities;
 
     @Override
     public @Nonnull DataCenterCapabilities getCapabilities() throws InternalException, CloudException {
         if( capabilities == null ) {
-            capabilities = new DatacenterCapabilities(getProvider());
+            capabilities = new ZonesCapabilities(getProvider());
         }
         return capabilities;
     }
@@ -110,14 +107,26 @@ public class Datacenters extends AbstractDataCenterServices<BrightBoxCloud> {
             if( dcList != null ) {
                 return dcList;
             }
-            ArrayList<DataCenter> dataCenters = new ArrayList<DataCenter>();
-            // TODO: query the API for the data center list
+            List<DataCenter> dataCenters = new ArrayList<DataCenter>();
+            List<Zone> zones = getProvider().getCloudApiService().listZones();
+            for( Zone zone : zones ) {
+                dataCenters.add(new DataCenter(zone.getId(), zone.getHandle(), zoneHandleToRegionId(zone.getHandle()), true, true));
+            }
             cache.put(ctx, dataCenters);
             return dataCenters;
         }
         finally {
             APITrace.end();
         }
+    }
+
+    private String zoneHandleToRegionId(String zoneHandle) {
+        String [] parts = zoneHandle.split("-");
+        String regionId = "gb1";
+        if( parts.length == 2 ) {
+            regionId = parts[0];
+        }
+        return regionId;
     }
 
     @Override
@@ -136,13 +145,19 @@ public class Datacenters extends AbstractDataCenterServices<BrightBoxCloud> {
                 return regions;
             }
             regions = new ArrayList<Region>();
-            // TODO: query the API for the regions
+            List<Zone> zones = getProvider().getCloudApiService().listZones();
+            for( Zone zone : zones ) {
+                String regionId = zoneHandleToRegionId(zone.getHandle());
+                Region region = new Region(regionId, regionId, true, true);
+                region.setJurisdiction(regionId.substring(0, 2));
+                regions.add(region);
+            }
             cache.put(ctx, regions);
             return regions;
-
         }
         finally {
             APITrace.end();
         }
     }
+
 }

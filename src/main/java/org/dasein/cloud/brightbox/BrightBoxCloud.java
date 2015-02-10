@@ -32,13 +32,19 @@ import org.dasein.cloud.ContextRequirements;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.ProviderContext;
 import org.dasein.cloud.brightbox.api.AuthenticationService;
+import org.dasein.cloud.brightbox.api.CloudApiService;
 import org.dasein.cloud.brightbox.api.ErrorHandler;
 import org.dasein.cloud.brightbox.api.model.Token;
-import org.dasein.cloud.brightbox.dc.Datacenters;
+import org.dasein.cloud.brightbox.compute.BrightBoxComputeServices;
+import org.dasein.cloud.brightbox.dc.Zones;
+import org.dasein.cloud.compute.ComputeServices;
+import org.dasein.cloud.network.NetworkServices;
+import org.dasein.cloud.platform.PlatformServices;
 import org.dasein.cloud.util.Cache;
 import org.dasein.cloud.util.CacheLevel;
 import org.dasein.util.uom.time.Second;
 import org.dasein.util.uom.time.TimePeriod;
+import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
 import retrofit.converter.GsonConverter;
 
@@ -108,8 +114,23 @@ public class BrightBoxCloud extends AbstractCloud {
     }
 
     @Override
-    public @Nonnull Datacenters getDataCenterServices() {
-        return new Datacenters(this);
+    public @Nonnull Zones getDataCenterServices() {
+        return new Zones(this);
+    }
+
+    @Override
+    public @Nullable ComputeServices getComputeServices() {
+        return new BrightBoxComputeServices(this);
+    }
+
+    @Override
+    public @Nullable NetworkServices getNetworkServices() {
+        return super.getNetworkServices();
+    }
+
+    @Override
+    public @Nullable PlatformServices getPlatformServices() {
+        return super.getPlatformServices();
     }
 
     @Override
@@ -163,6 +184,34 @@ public class BrightBoxCloud extends AbstractCloud {
             return token.getAccessToken();
         }
         throw new CloudException("Unable to authenticate");
+    }
+
+    /**
+     * Return transport service instance
+     * @return
+     * @throws CloudException
+     * @throws InternalException
+     */
+    public CloudApiService getCloudApiService() throws CloudException, InternalException {
+        final String token = authenticate();
+        RequestInterceptor interceptor = new RequestInterceptor() {
+            @Override public void intercept(RequestFacade request) {
+                request.addHeader("Authorization", "OAuth " + token);
+            }
+        };
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                .create();
+        RestAdapter adapter = new RestAdapter.Builder()
+                .setEndpoint(getContext().getCloud().getEndpoint())
+                .setConverter(new GsonConverter(gson))
+                .setLogLevel(RestAdapter.LogLevel.FULL)
+                .setLog(getWireLog(BrightBoxCloud.class))
+                .setErrorHandler(new ErrorHandler())
+                .setRequestInterceptor(interceptor)
+                .build();
+        return adapter.create(CloudApiService.class);
     }
 
     @Override

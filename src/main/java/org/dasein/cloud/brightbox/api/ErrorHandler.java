@@ -18,6 +18,9 @@
 
 package org.dasein.cloud.brightbox.api;
 
+import org.dasein.cloud.CloudErrorType;
+import org.dasein.cloud.CloudException;
+import org.dasein.cloud.InternalException;
 import org.dasein.cloud.brightbox.UnauthorizedException;
 import retrofit.RetrofitError;
 import retrofit.client.Response;
@@ -29,8 +32,24 @@ public class ErrorHandler implements retrofit.ErrorHandler {
     @Override
     public Throwable handleError(RetrofitError cause) {
         Response r = cause.getResponse();
-        if( r != null && r.getStatus() == 401 ) {
-            return new UnauthorizedException(cause);
+        if( r != null ) {
+            switch( r.getStatus() ) {
+                case 401:
+                    return new UnauthorizedException(cause);
+                case 403:
+                    return new CloudException(CloudErrorType.GENERAL, 403, r.getReason(), r.getReason());
+                case 400:
+                case 404:
+                case 405:
+                case 422:
+                    return new InternalException(r.getReason());
+                case 409:
+                case 423:
+                    return new CloudException(r.getReason());
+                case 500:
+                case 501:
+                    return new CloudException(r.getReason());
+            }
         }
         return cause;
     }

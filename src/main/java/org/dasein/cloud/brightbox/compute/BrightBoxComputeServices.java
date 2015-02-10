@@ -16,28 +16,31 @@
  * ====================================================================
  */
 
-package org.dasein.cloud.brightbox.api.model;
+package org.dasein.cloud.brightbox.compute;
+
+import org.dasein.cloud.brightbox.BrightBoxCloud;
+import org.dasein.cloud.compute.AbstractComputeServices;
+import org.dasein.cloud.compute.MachineImageSupport;
+import org.dasein.cloud.compute.VirtualMachineSupport;
+
+import javax.annotation.Nullable;
 
 /**
- * Created by stas on 09/02/2015.
+ * Created by stas on 10/02/2015.
  */
-public class Token {
-    private String accessToken;
-    private long expiresIn;
+public class BrightBoxComputeServices extends AbstractComputeServices<BrightBoxCloud> {
 
-    public String getAccessToken() {
-        return accessToken;
+    public BrightBoxComputeServices(BrightBoxCloud provider) {
+        super(provider);
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    @Override
+    public @Nullable MachineImageSupport getImageSupport() {
+        return new BrightBoxMachineImageSupport(getProvider());
     }
 
-    public long getExpiresIn() {
-        return expiresIn;
-    }
-
-    public void setExpiresIn(long expiresIn) {
-        this.expiresIn = expiresIn;
+    @Override
+    public @Nullable VirtualMachineSupport getVirtualMachineSupport() {
+        return new BrightBoxVmSupport(getProvider());
     }
 }

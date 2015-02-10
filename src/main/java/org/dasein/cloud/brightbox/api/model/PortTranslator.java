@@ -19,25 +19,34 @@
 package org.dasein.cloud.brightbox.api.model;
 
 /**
- * Created by stas on 09/02/2015.
+ * Created by stas on 10/02/2015.
  */
-public class Token {
-    private String accessToken;
-    private long expiresIn;
+public class PortTranslator {
+    private int incoming;
+    private int outgoing;
+    private String protocol;
 
-    public String getAccessToken() {
-        return accessToken;
+    public int getIncoming() {
+        return incoming;
     }
 
-    public void setAccessToken(String accessToken) {
-        this.accessToken = accessToken;
+    public void setIncoming(int incoming) {
+        this.incoming = incoming;
     }
 
-    public long getExpiresIn() {
-        return expiresIn;
+    public int getOutgoing() {
+        return outgoing;
     }
 
-    public void setExpiresIn(long expiresIn) {
-        this.expiresIn = expiresIn;
+    public void setOutgoing(int outgoing) {
+        this.outgoing = outgoing;
+    }
+
+    public String getProtocol() {
+        return protocol;
+    }
+
+    public void setProtocol(String protocol) {
+        this.protocol = protocol;
     }
 }

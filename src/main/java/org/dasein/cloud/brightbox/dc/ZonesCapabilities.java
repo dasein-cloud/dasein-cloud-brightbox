@@ -28,9 +28,9 @@ import java.util.Locale;
 /**
  * Created by stas on 09/02/2015.
  */
-public class DatacenterCapabilities extends AbstractCapabilities<BrightBoxCloud> implements DataCenterCapabilities {
+public class ZonesCapabilities extends AbstractCapabilities<BrightBoxCloud> implements DataCenterCapabilities {
 
-    public DatacenterCapabilities(@Nonnull BrightBoxCloud provider) {
+    public ZonesCapabilities(@Nonnull BrightBoxCloud provider) {
         super(provider);
     }
 
