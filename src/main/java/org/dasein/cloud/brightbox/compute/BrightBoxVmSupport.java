@@ -38,6 +38,7 @@ import org.dasein.util.uom.storage.Gigabyte;
 import org.dasein.util.uom.storage.Megabyte;
 import org.dasein.util.uom.storage.Storage;
 import org.dasein.util.uom.storage.StorageUnit;
+import retrofit.client.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

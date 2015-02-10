@@ -19,6 +19,7 @@
 package org.dasein.cloud.brightbox.compute;
 
 import org.dasein.cloud.AbstractCapabilities;
+import org.dasein.cloud.Capabilities;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.Requirement;
@@ -100,12 +101,12 @@ public class BrightBoxVmCapabilities extends AbstractCapabilities<BrightBoxCloud
 
     @Override
     public int getMaximumVirtualMachineCount() throws CloudException, InternalException {
-        return 0;
+        return Capabilities.LIMIT_UNKNOWN;
     }
 
     @Override
     public int getCostFactor(@Nonnull VmState state) throws CloudException, InternalException {
-        return 0;
+        return VmState.TERMINATED.equals(state) ? 0 : 100;
     }
 
     @Override

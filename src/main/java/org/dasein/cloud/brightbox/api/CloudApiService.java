@@ -18,10 +18,12 @@
 
 package org.dasein.cloud.brightbox.api;
 
+import org.dasein.cloud.CloudException;
 import org.dasein.cloud.brightbox.api.model.Image;
 import org.dasein.cloud.brightbox.api.model.Server;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.brightbox.api.model.Zone;
+import retrofit.client.Response;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -46,7 +48,7 @@ public interface CloudApiService {
     // images
     @GET(VERSION + "/images") List<Image> listImages();
     @GET(VERSION + "/images/{id}") Image getImage(@Path("id") String id);
-    @DELETE(VERSION + "/images/{id}") void deleteImage(@Path("id") String id);
+    @DELETE(VERSION + "/images/{id}") Response deleteImage(@Path("id") String id);
 
     // servers
     @FormUrlEncoded
@@ -55,14 +57,14 @@ public interface CloudApiService {
 
     @GET(VERSION + "/servers/{id}") Server getServer(@Path("id") String id);
     @PUT(VERSION + "/servers/{id}") Server updateServer(@Path("id") String id, @Nullable String name, @Nullable String userData, @Nullable String compatibilityMode);
-    @DELETE(VERSION + "/servers/{id}") void deleteServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/start") void startServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/stop") void stopServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/reboot") void rebootServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/reset") void resetServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/shutdown") void shutdownServer(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/activate_console") void activateConsole(@Path("id") String id);
-    @POST(VERSION + "/servers/{id}/snapshot") void snapshotServer(@Path("id") String id);
+    @DELETE(VERSION + "/servers/{id}") Response deleteServer(@Path("id") String id) throws CloudException;
+    @POST(VERSION + "/servers/{id}/start") Response startServer(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/stop") Response stopServer(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/reboot") Response rebootServer(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/reset") Response resetServer(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/shutdown") Response shutdownServer(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/activate_console") Response activateConsole(@Path("id") String id);
+    @POST(VERSION + "/servers/{id}/snapshot") Response snapshotServer(@Path("id") String id);
 
     // server types
     @GET(VERSION + "/server_types") List<ServerType> listServerTypes();
