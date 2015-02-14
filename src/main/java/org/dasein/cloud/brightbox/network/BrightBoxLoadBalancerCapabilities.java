@@ -94,6 +94,11 @@ public class BrightBoxLoadBalancerCapabilities extends AbstractCapabilities<Brig
     }
 
     @Override
+    public @Nonnull Requirement identifyHealthCheckOnCreateRequirement() throws CloudException, InternalException {
+        return Requirement.REQUIRED;
+    }
+
+    @Override
     public boolean isAddressAssignedByProvider() throws CloudException, InternalException {
         return false;
     }

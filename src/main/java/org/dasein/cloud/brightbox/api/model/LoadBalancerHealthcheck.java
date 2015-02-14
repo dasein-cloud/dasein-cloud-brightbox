@@ -24,11 +24,11 @@ package org.dasein.cloud.brightbox.api.model;
 public class LoadBalancerHealthcheck {
     private String type;
     private String request;
-    private int port;
-    private int interval;
-    private int timeout;
-    private int thresholdUp;
-    private int thresholdDown;
+    private Integer port;
+    private Integer interval;
+    private Integer timeout;
+    private Integer thresholdUp;
+    private Integer thresholdDown;
 
     public String getType() {
         return type;
@@ -46,43 +46,43 @@ public class LoadBalancerHealthcheck {
         this.request = request;
     }
 
-    public int getPort() {
+    public Integer getPort() {
         return port;
     }
 
-    public void setPort(int port) {
+    public void setPort(Integer port) {
         this.port = port;
     }
 
-    public int getInterval() {
+    public Integer getInterval() {
         return interval;
     }
 
-    public void setInterval(int interval) {
+    public void setInterval(Integer interval) {
         this.interval = interval;
     }
 
-    public int getTimeout() {
+    public Integer getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(int timeout) {
+    public void setTimeout(Integer timeout) {
         this.timeout = timeout;
     }
 
-    public int getThresholdUp() {
+    public Integer getThresholdUp() {
         return thresholdUp;
     }
 
-    public void setThresholdUp(int thresholdUp) {
+    public void setThresholdUp(Integer thresholdUp) {
         this.thresholdUp = thresholdUp;
     }
 
-    public int getThresholdDown() {
+    public Integer getThresholdDown() {
         return thresholdDown;
     }
 
-    public void setThresholdDown(int thresholdDown) {
+    public void setThresholdDown(Integer thresholdDown) {
         this.thresholdDown = thresholdDown;
     }
 }

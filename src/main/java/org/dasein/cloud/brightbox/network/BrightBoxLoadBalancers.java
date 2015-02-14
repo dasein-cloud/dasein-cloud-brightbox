@@ -25,6 +25,7 @@ import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.ResourceStatus;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
+import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
 import org.dasein.cloud.brightbox.api.model.LoadBalancerHealthcheck;
 import org.dasein.cloud.brightbox.api.model.LoadBalancerListener;
 import org.dasein.cloud.brightbox.api.model.LoadBalancerNode;
@@ -87,41 +88,42 @@ public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBo
 
     @Override
     public @Nonnull String createLoadBalancer(@Nonnull LoadBalancerCreateOptions options) throws CloudException, InternalException {
-        JsonArray nodes = new JsonArray();
+        List<LoadBalancerNode> nodes = new ArrayList<LoadBalancerNode>();
         for( LoadBalancerEndpoint endpoint : options.getEndpoints() ) {
             if( LbEndpointType.VM.equals(endpoint.getEndpointType()) ) {
-                JsonObject ob = new JsonObject();
-                ob.addProperty("node", endpoint.getEndpointValue());
-                nodes.add(ob);
+                nodes.add(new LoadBalancerNode(endpoint.getEndpointValue()));
                 break;
             }
         }
-        JsonArray listeners = new JsonArray();
-        for( LbListener listener : options.getListeners() ) {
-            JsonObject ob = new JsonObject();
-            ob.addProperty("protocol", toBBProtocol(listener.getNetworkProtocol()));
-            ob.addProperty("in", listener.getPrivatePort());
-            ob.addProperty("out", listener.getPublicPort());
+        List<LoadBalancerListener> listeners = new ArrayList<LoadBalancerListener>();
+        for( LbListener l : options.getListeners() ) {
+            LoadBalancerListener listener = new LoadBalancerListener();
+            listener.setProtocol(toBBProtocol(l.getNetworkProtocol()));
+            listener.setIn(l.getPrivatePort());
+            listener.setOut(l.getPublicPort());
             if( options.getLbAttributesOptions() != null ) {
-                ob.addProperty("timeout", options.getLbAttributesOptions().getIdleConnectionTimeout());
+                listener.setTimeout(options.getLbAttributesOptions().getIdleConnectionTimeout());
             }
-            listeners.add(ob);
+            listeners.add(listener);
         }
         HealthCheckOptions hco = options.getHealthCheckOptions();
-        JsonObject healthcheck = null;
+        LoadBalancerHealthcheck healthcheck = null;
         if( hco != null ) {
-            healthcheck = new JsonObject();
-            healthcheck.addProperty("timeout", hco.getTimeout());
-            healthcheck.addProperty("interval", hco.getInterval());
-            healthcheck.addProperty("port", hco.getPort());
-            healthcheck.addProperty("request", hco.getPath());
-            healthcheck.addProperty("threshold_down", hco.getUnhealthyCount());
-            healthcheck.addProperty("threshold_up", hco.getHealthyCount());
-            healthcheck.addProperty("type", hco.getProtocol().equals(LoadBalancerHealthCheck.HCProtocol.HTTPS) ? "https" : "http");
+            healthcheck = new LoadBalancerHealthcheck();
+            healthcheck.setTimeout(hco.getTimeout());
+            healthcheck.setInterval(hco.getInterval());
+            healthcheck.setPort(hco.getPort());
+            healthcheck.setRequest(hco.getPath());
+            healthcheck.setThresholdDown(hco.getUnhealthyCount());
+            healthcheck.setThresholdUp(hco.getHealthyCount());
+            healthcheck.setType(hco.getProtocol().equals(LoadBalancerHealthCheck.HCProtocol.HTTPS) ? "https" : "http");
         }
-        String nodesString = nodes.toString();
-        org.dasein.cloud.brightbox.api.model.LoadBalancer lb = getProvider().getCloudApiService().createLoadBalancer(options.getName(), nodesString, null, null, null, false, listeners, healthcheck, null);
-
+        CreateLoadBalancer clb = new CreateLoadBalancer();
+        clb.setName(options.getName());
+        clb.setNodes(nodes);
+        clb.setHealthcheck(healthcheck);
+        clb.setListeners(listeners);
+        org.dasein.cloud.brightbox.api.model.LoadBalancer lb = getProvider().getCloudApiService().createLoadBalancer(clb);
         return lb.getId();
     }
 

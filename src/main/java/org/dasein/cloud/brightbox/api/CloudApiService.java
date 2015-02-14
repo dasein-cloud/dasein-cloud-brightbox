@@ -21,6 +21,7 @@ package org.dasein.cloud.brightbox.api;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.dasein.cloud.CloudException;
+import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
 import org.dasein.cloud.brightbox.api.model.Image;
 import org.dasein.cloud.brightbox.api.model.LoadBalancer;
 import org.dasein.cloud.brightbox.api.model.LoadBalancerHealthcheck;
@@ -30,6 +31,7 @@ import org.dasein.cloud.brightbox.api.model.Server;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.brightbox.api.model.Zone;
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
 import retrofit.http.FormUrlEncoded;
@@ -77,6 +79,8 @@ public interface CloudApiService {
 
     // load balancers
     @GET(VERSION + "/load_balancers") List<LoadBalancer> listLoadBalancers() throws CloudException;
+    @POST(VERSION + "/load_balancers")
+    LoadBalancer createLoadBalancer(@Body CreateLoadBalancer loadBalancer) throws CloudException;
     @FormUrlEncoded
     @POST(VERSION + "/load_balancers")
     LoadBalancer createLoadBalancer(

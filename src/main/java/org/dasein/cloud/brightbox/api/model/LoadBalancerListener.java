@@ -22,24 +22,24 @@ package org.dasein.cloud.brightbox.api.model;
  * Created by stas on 13/02/2015.
  */
 public class LoadBalancerListener {
-    private int in;
-    private int out;
+    private Integer in;
+    private Integer out;
     private String protocol;
-    private int timeout;
+    private Integer timeout;
 
     public int getIn() {
         return in;
     }
 
-    public void setIn(int in) {
+    public void setIn(Integer in) {
         this.in = in;
     }
 
-    public int getOut() {
+    public Integer getOut() {
         return out;
     }
 
-    public void setOut(int out) {
+    public void setOut(Integer out) {
         this.out = out;
     }
 
@@ -51,11 +51,11 @@ public class LoadBalancerListener {
         this.protocol = protocol;
     }
 
-    public int getTimeout() {
+    public Integer getTimeout() {
         return timeout;
     }
 
-    public void setTimeout(int timeout) {
+    public void setTimeout(Integer timeout) {
         this.timeout = timeout;
     }
 }
