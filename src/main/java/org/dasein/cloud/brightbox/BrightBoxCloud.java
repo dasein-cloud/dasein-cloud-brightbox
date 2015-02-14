@@ -37,6 +37,7 @@ import org.dasein.cloud.brightbox.api.ErrorHandler;
 import org.dasein.cloud.brightbox.api.model.Token;
 import org.dasein.cloud.brightbox.compute.BrightBoxComputeServices;
 import org.dasein.cloud.brightbox.dc.Zones;
+import org.dasein.cloud.brightbox.network.BrightBoxNetworkServices;
 import org.dasein.cloud.compute.ComputeServices;
 import org.dasein.cloud.network.NetworkServices;
 import org.dasein.cloud.platform.PlatformServices;
@@ -125,7 +126,7 @@ public class BrightBoxCloud extends AbstractCloud {
 
     @Override
     public @Nullable NetworkServices getNetworkServices() {
-        return super.getNetworkServices();
+        return new BrightBoxNetworkServices(this);
     }
 
     @Override
@@ -161,17 +162,7 @@ public class BrightBoxCloud extends AbstractCloud {
             }
         }
         // nothing in the cache, request a new token
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(Date.class, new DateTypeAdapter())
-                .create();
-        RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint(getContext().getCloud().getEndpoint())
-                .setConverter(new GsonConverter(gson))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setLog(getWireLog(BrightBoxCloud.class))
-                .setErrorHandler(new ErrorHandler())
-                .build();
+        RestAdapter adapter = getRestAdapterBuilder().build();
         AuthenticationService service = adapter.create(AuthenticationService.class);
         byte[][] keys = ( byte[][] ) getContext().getConfigurationValue("apiKey");
         String clientId = new String(keys[0]);
@@ -199,19 +190,23 @@ public class BrightBoxCloud extends AbstractCloud {
                 request.addHeader("Authorization", "OAuth " + token);
             }
         };
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .registerTypeAdapter(Date.class, new DateTypeAdapter())
-                .create();
-        RestAdapter adapter = new RestAdapter.Builder()
-                .setEndpoint(getContext().getCloud().getEndpoint())
-                .setConverter(new GsonConverter(gson))
-                .setLogLevel(RestAdapter.LogLevel.FULL)
-                .setLog(getWireLog(BrightBoxCloud.class))
-                .setErrorHandler(new ErrorHandler())
+        RestAdapter adapter = getRestAdapterBuilder()
                 .setRequestInterceptor(interceptor)
                 .build();
         return adapter.create(CloudApiService.class);
+    }
+
+    private transient volatile RestAdapter.Builder restAdapter;
+
+    private RestAdapter.Builder getRestAdapterBuilder() {
+        if( restAdapter == null ) {
+            Gson gson = new GsonBuilder()
+                    .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
+                    .create();
+            restAdapter = new RestAdapter.Builder().setEndpoint(getContext().getCloud().getEndpoint()).setConverter(new GsonConverter(gson)).setLogLevel(RestAdapter.LogLevel.FULL).setLog(getWireLog(BrightBoxCloud.class)).setErrorHandler(new ErrorHandler());
+        }
+        return restAdapter;
     }
 
     @Override

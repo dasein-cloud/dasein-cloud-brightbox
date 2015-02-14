@@ -71,6 +71,15 @@ public class BrightBoxMachineImageSupport extends AbstractImageSupport<BrightBox
 
     @Override
     public @Nonnull Iterable<MachineImage> listImages(@Nullable ImageFilterOptions options) throws CloudException, InternalException {
+        return listImages(options, false);
+    }
+
+    @Override
+    public @Nonnull Iterable<MachineImage> searchPublicImages(@Nonnull ImageFilterOptions options) throws CloudException, InternalException {
+        return listImages(options, true);
+    }
+
+    private @Nonnull Iterable<MachineImage> listImages(@Nullable ImageFilterOptions options, boolean onlyPublic) throws CloudException, InternalException {
         List<Image> images = getProvider().getCloudApiService().listImages();
         List<MachineImage> results = new ArrayList<MachineImage>(images.size());
         for( Image image : images ) {
@@ -79,11 +88,11 @@ public class BrightBoxMachineImageSupport extends AbstractImageSupport<BrightBox
                 continue;
             }
             if( options != null ) {
-                if( options.matches(mi) ) {
+                if( options.matches(mi) && ((onlyPublic && image.isPublic()) || !onlyPublic) ) {
                     results.add(mi);
                 }
             }
-            else {
+            else if ((onlyPublic && image.isPublic()) || !onlyPublic){
                 results.add(mi);
             }
         }
