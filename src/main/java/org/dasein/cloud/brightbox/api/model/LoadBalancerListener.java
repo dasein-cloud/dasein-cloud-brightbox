@@ -27,7 +27,14 @@ public class LoadBalancerListener {
     private String protocol;
     private Integer timeout;
 
-    public int getIn() {
+    public LoadBalancerListener(Integer in, Integer out, String protocol, Integer timeout) {
+        this.in = in;
+        this.out = out;
+        this.protocol = protocol;
+        this.timeout = timeout;
+    }
+
+    public Integer getIn() {
         return in;
     }
 

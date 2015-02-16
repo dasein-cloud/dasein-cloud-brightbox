@@ -81,19 +81,9 @@ public interface CloudApiService {
     @GET(VERSION + "/load_balancers") List<LoadBalancer> listLoadBalancers() throws CloudException;
     @POST(VERSION + "/load_balancers")
     LoadBalancer createLoadBalancer(@Body CreateLoadBalancer loadBalancer) throws CloudException;
-    @FormUrlEncoded
-    @POST(VERSION + "/load_balancers")
-    LoadBalancer createLoadBalancer(
-            @Field("name") @Nullable String name,
-            @Field("nodes") @Nonnull String nodes,
-            @Field("policy") @Nullable String policy,
-            @Field("certificate_pem") @Nullable String certificatePem,
-            @Field("certificate_key") @Nullable String certificateKey,
-            @Field("sslv3") boolean sslv3,
-            @Field("listeners") @Nonnull JsonArray listeners,
-            @Field("healthcheck") @Nonnull JsonObject healthcheck,
-            @Field("buffer_size") Integer bufferSize) throws CloudException;
     @GET(VERSION + "/load_balancers/{id}") LoadBalancer getLoadBalancer(@Path("id") String id) throws CloudException;
+    @PUT(VERSION + "/load_balancers/{id}")
+    LoadBalancer updateLoadBalancer(@Path("id") @Nonnull String id, @Body CreateLoadBalancer loadBalancer) throws CloudException;
     @FormUrlEncoded
     @PUT(VERSION + "/load_balancers/{id}")
     LoadBalancer updateLoadBalancer(

@@ -42,13 +42,12 @@ public class ErrorHandler implements retrofit.ErrorHandler {
             switch( r.getStatus() ) {
                 case 401:
                     return new UnauthorizedException(cause);
-                case 403:
-                    return new CloudException(CloudErrorType.GENERAL, 403, r.getReason(), r.getReason());
                 case 400:
                 case 404:
                 case 405:
                 case 422:
                     return new InternalException(r.getReason());
+                case 403:
                 case 409:
                     BrightBoxError error = ( BrightBoxError ) cause.getBodyAs(BrightBoxError.class);
                     if( error != null && error.errors != null && error.errors.length > 0 )
