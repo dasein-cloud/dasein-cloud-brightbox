@@ -85,19 +85,6 @@ public interface CloudApiService {
     @PUT(VERSION + "/load_balancers/{id}")
     LoadBalancer updateLoadBalancer(@Path("id") @Nonnull String id, @Body CreateLoadBalancer loadBalancer) throws CloudException;
     @FormUrlEncoded
-    @PUT(VERSION + "/load_balancers/{id}")
-    LoadBalancer updateLoadBalancer(
-            @Path("id") @Nonnull String id,
-            @Field("name") @Nullable String name,
-            @Field("nodes") @Nullable List<LoadBalancerNode> nodes,
-            @Field("policy") @Nullable String policy,
-            @Field("certificate_pem") @Nullable String certificatePem,
-            @Field("certificate_key") @Nullable String certificateKey,
-            @Field("sslv3") boolean sslv3,
-            @Field("listeners") @Nullable List<LoadBalancerListener> listeners,
-            @Field("healthcheck") @Nullable LoadBalancerHealthcheck healthcheck,
-            @Field("buffer_size") Integer bufferSize) throws CloudException;
-    @FormUrlEncoded
     @POST(VERSION + "/load_balancers/{id}/add_nodes")
     LoadBalancer addNodesToLoadBalancer(
             @Path("id") @Nonnull String id,
@@ -117,6 +104,7 @@ public interface CloudApiService {
     LoadBalancer removeListenersFromLoadBalancer(
             @Path("id") @Nonnull String id,
             @Field("listeners") @Nonnull List<LoadBalancerListener> listeners) throws CloudException;
-    @DELETE(VERSION + "/load_balancers/{id}") Response deleteLoadBalancer(@Path("id") String id) throws CloudException;
+    @DELETE(VERSION + "/load_balancers/{id}")
+    Response deleteLoadBalancer(@Path("id") String id) throws CloudException;
 
 }

@@ -29,6 +29,7 @@ import org.dasein.cloud.ResourceStatus;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
 import org.dasein.cloud.brightbox.api.model.*;
 import org.dasein.cloud.compute.VmState;
+import org.dasein.cloud.dc.DataCenter;
 import org.dasein.cloud.network.*;
 import org.dasein.cloud.network.LoadBalancer;
 
@@ -38,8 +39,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by stas on 13/02/2015.
@@ -191,9 +194,18 @@ public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBo
             listeners.add(LbListener.getInstance(toLbProtocol(l.getProtocol()), l.getOut(), l.getIn()));
             i++;
         }
+//        Map<String, String> dataCenters = new HashMap<String, String>();
+//        for( Server s : lb.getNodes() ) {
+//            dataCenters.put(s.getZone().getId(), s.getZone().getId());
+//        }
         return LoadBalancer.getInstance(lb.getAccount().getId(), getContext().getRegionId(), lb.getId(), toLoadBalancerState(lb.getStatus()), lb.getName(), lb.getName(), LbType.INTERNAL,
 LoadBalancerAddressType.IP, lb.getUrl(), lb.getId(), ports).withListeners(listeners.toArray(new LbListener[listeners.size()]));
+//        .operatingIn(dataCenters.keySet().toArray(new String[dataCenters.size()]));
     }
+
+    private DataCenter toDataCenter(Zone zone) throws CloudException {
+        return new DataCenter(zone.getId(), zone.getHandle(), getContext().getRegionId(), true, true);
+    };
 
     private LoadBalancerState toLoadBalancerState(String status) {
         if( "active".equals(status) ) {
@@ -303,6 +315,11 @@ LoadBalancerAddressType.IP, lb.getUrl(), lb.getId(), ports).withListeners(listen
         }
         lb.setListeners(listenersToKeep);
         getProvider().getCloudApiService().updateLoadBalancer(fromLoadBalancerId, lb);
+//        List<LoadBalancerListener> removeListeners = new ArrayList<LoadBalancerListener>();
+//        for( LbListener l : listeners ) {
+//            removeListeners.add(new LoadBalancerListener(l.getPrivatePort(), l.getPublicPort(), toBBProtocol(l.getNetworkProtocol()), 0));
+//        }
+//        getProvider().getCloudApiService().removeListenersFromLoadBalancer(fromLoadBalancerId, removeListeners);
     }
 
     @Override
