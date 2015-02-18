@@ -18,20 +18,37 @@
 
 package org.dasein.cloud.brightbox.network;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.OperationNotSupportedException;
-import org.dasein.cloud.ProviderContext;
 import org.dasein.cloud.ResourceStatus;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
-import org.dasein.cloud.brightbox.api.model.*;
-import org.dasein.cloud.compute.VmState;
+import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
+import org.dasein.cloud.brightbox.api.model.LoadBalancerHealthcheck;
+import org.dasein.cloud.brightbox.api.model.LoadBalancerListener;
+import org.dasein.cloud.brightbox.api.model.LoadBalancerNode;
+import org.dasein.cloud.brightbox.api.model.Server;
+import org.dasein.cloud.brightbox.api.model.Zone;
 import org.dasein.cloud.dc.DataCenter;
-import org.dasein.cloud.network.*;
+import org.dasein.cloud.network.AbstractLoadBalancerSupport;
+import org.dasein.cloud.network.HealthCheckFilterOptions;
+import org.dasein.cloud.network.HealthCheckOptions;
+import org.dasein.cloud.network.LbAlgorithm;
+import org.dasein.cloud.network.LbEndpointState;
+import org.dasein.cloud.network.LbEndpointType;
+import org.dasein.cloud.network.LbListener;
+import org.dasein.cloud.network.LbProtocol;
+import org.dasein.cloud.network.LbType;
 import org.dasein.cloud.network.LoadBalancer;
+import org.dasein.cloud.network.LoadBalancerAddressType;
+import org.dasein.cloud.network.LoadBalancerCapabilities;
+import org.dasein.cloud.network.LoadBalancerCreateOptions;
+import org.dasein.cloud.network.LoadBalancerEndpoint;
+import org.dasein.cloud.network.LoadBalancerHealthCheck;
+import org.dasein.cloud.network.LoadBalancerState;
+import org.dasein.cloud.network.SSLCertificate;
+import org.dasein.cloud.network.SSLCertificateCreateOptions;
+import org.dasein.cloud.network.SetLoadBalancerSSLCertificateOptions;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -39,10 +56,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by stas on 13/02/2015.

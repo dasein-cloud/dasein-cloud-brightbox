@@ -18,15 +18,10 @@
 
 package org.dasein.cloud.brightbox.api;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
 import org.dasein.cloud.brightbox.api.model.Image;
 import org.dasein.cloud.brightbox.api.model.LoadBalancer;
-import org.dasein.cloud.brightbox.api.model.LoadBalancerHealthcheck;
-import org.dasein.cloud.brightbox.api.model.LoadBalancerListener;
-import org.dasein.cloud.brightbox.api.model.LoadBalancerNode;
 import org.dasein.cloud.brightbox.api.model.Server;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.brightbox.api.model.Zone;
@@ -34,19 +29,15 @@ import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
-import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
-import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PUT;
-import retrofit.http.Part;
 import retrofit.http.Path;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Created by stas on 09/02/2015.

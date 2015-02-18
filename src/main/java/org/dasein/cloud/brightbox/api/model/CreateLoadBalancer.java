@@ -27,16 +27,16 @@ import java.util.List;
  */
 public class CreateLoadBalancer {
     private @Nullable String                     name;
-    private @Nonnull  List<LoadBalancerNode>     nodes;
+    private @Nullable List<LoadBalancerNode>     nodes;
     private @Nullable String                     policy;
     private @Nullable String                     certificatePem;
     private @Nullable String                     certificateKey;
-    private           boolean                    sslv3;
-    private @Nonnull  List<LoadBalancerListener> listeners;
-    private @Nonnull  LoadBalancerHealthcheck    healthcheck;
+    private @Nullable Boolean                    sslv3;
+    private @Nullable List<LoadBalancerListener> listeners;
+    private @Nullable LoadBalancerHealthcheck    healthcheck;
     private @Nullable Integer                    bufferSize;
 
-    @Nullable public String getName() {
+    public @Nullable String getName() {
         return name;
     }
 
@@ -44,15 +44,15 @@ public class CreateLoadBalancer {
         this.name = name;
     }
 
-    @Nonnull public List<LoadBalancerNode> getNodes() {
+    public @Nullable List<LoadBalancerNode> getNodes() {
         return nodes;
     }
 
-    public void setNodes(@Nonnull List<LoadBalancerNode> nodes) {
+    public void setNodes(@Nullable List<LoadBalancerNode> nodes) {
         this.nodes = nodes;
     }
 
-    @Nullable public String getPolicy() {
+    public @Nullable String getPolicy() {
         return policy;
     }
 
@@ -60,7 +60,7 @@ public class CreateLoadBalancer {
         this.policy = policy;
     }
 
-    @Nullable public String getCertificatePem() {
+    public @Nullable String getCertificatePem() {
         return certificatePem;
     }
 
@@ -68,7 +68,7 @@ public class CreateLoadBalancer {
         this.certificatePem = certificatePem;
     }
 
-    @Nullable public String getCertificateKey() {
+    public @Nullable String getCertificateKey() {
         return certificateKey;
     }
 
@@ -76,31 +76,31 @@ public class CreateLoadBalancer {
         this.certificateKey = certificateKey;
     }
 
-    public boolean isSslv3() {
+    public @Nullable Boolean isSslv3() {
         return sslv3;
     }
 
-    public void setSslv3(boolean sslv3) {
+    public void setSslv3(@Nullable Boolean sslv3) {
         this.sslv3 = sslv3;
     }
 
-    @Nonnull public List<LoadBalancerListener> getListeners() {
+    public @Nullable List<LoadBalancerListener> getListeners() {
         return listeners;
     }
 
-    public void setListeners(@Nonnull List<LoadBalancerListener> listeners) {
+    public void setListeners(@Nullable List<LoadBalancerListener> listeners) {
         this.listeners = listeners;
     }
 
-    @Nonnull public LoadBalancerHealthcheck getHealthcheck() {
+    public @Nullable LoadBalancerHealthcheck getHealthcheck() {
         return healthcheck;
     }
 
-    public void setHealthcheck(@Nonnull LoadBalancerHealthcheck healthcheck) {
+    public void setHealthcheck(@Nullable LoadBalancerHealthcheck healthcheck) {
         this.healthcheck = healthcheck;
     }
 
-    @Nullable public Integer getBufferSize() {
+    public @Nullable Integer getBufferSize() {
         return bufferSize;
     }
 
