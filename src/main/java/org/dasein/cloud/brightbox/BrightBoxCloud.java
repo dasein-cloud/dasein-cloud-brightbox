@@ -20,7 +20,6 @@
 package org.dasein.cloud.brightbox;
 
 import com.google.gson.FieldNamingPolicy;
-import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.internal.bind.DateTypeAdapter;
 import org.apache.commons.codec.binary.Base64;
@@ -200,11 +199,15 @@ public class BrightBoxCloud extends AbstractCloud {
 
     private RestAdapter.Builder getRestAdapterBuilder() {
         if( restAdapter == null ) {
-            Gson gson = new GsonBuilder()
+            GsonBuilder builder = new GsonBuilder()
                     .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                    .registerTypeAdapter(Date.class, new DateTypeAdapter())
-                    .create();
-            restAdapter = new RestAdapter.Builder().setEndpoint(getContext().getCloud().getEndpoint()).setConverter(new GsonConverter(gson)).setLogLevel(RestAdapter.LogLevel.FULL).setLog(getWireLog(BrightBoxCloud.class)).setErrorHandler(new ErrorHandler());
+                    .registerTypeAdapter(Date.class, new DateTypeAdapter());
+            restAdapter = new RestAdapter.Builder()
+                    .setEndpoint(getContext().getCloud().getEndpoint())
+                    .setConverter(new GsonConverter(builder.create()))
+                    .setLogLevel(RestAdapter.LogLevel.FULL)
+                    .setLog(getWireLog(BrightBoxCloud.class))
+                    .setErrorHandler(new ErrorHandler());
         }
         return restAdapter;
     }

@@ -18,14 +18,19 @@
 
 package org.dasein.cloud.brightbox.api.model;
 
+import java.io.Serializable;
+
 /**
  * Created by stas on 13/02/2015.
  */
-public class LoadBalancerListener {
+public class LoadBalancerListener implements Serializable {
+
     private Integer in;
     private Integer out;
     private String protocol;
     private Integer timeout;
+
+    public LoadBalancerListener() {}
 
     public LoadBalancerListener(Integer in, Integer out, String protocol, Integer timeout) {
         this.in = in;

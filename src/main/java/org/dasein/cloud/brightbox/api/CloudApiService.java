@@ -34,15 +34,19 @@ import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.Field;
+import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.GET;
+import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PUT;
+import retrofit.http.Part;
 import retrofit.http.Path;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by stas on 09/02/2015.
@@ -88,22 +92,19 @@ public interface CloudApiService {
     @POST(VERSION + "/load_balancers/{id}/add_nodes")
     LoadBalancer addNodesToLoadBalancer(
             @Path("id") @Nonnull String id,
-            @Field("nodes") @Nonnull List<Server> nodes) throws CloudException;
-    @FormUrlEncoded
+            @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @POST(VERSION + "/load_balancers/{id}/remove_nodes")
     LoadBalancer removeNodesFromLoadBalancer(
             @Path("id") @Nonnull String id,
-            @Field("nodes") @Nonnull List<Server> nodes) throws CloudException;
-    @FormUrlEncoded
+            @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @POST(VERSION + "/load_balancers/{id}/add_listeners")
     LoadBalancer addListenersToLoadBalancer(
             @Path("id") @Nonnull String id,
-            @Field("listeners") @Nonnull List<LoadBalancerListener> listeners) throws CloudException;
-    @FormUrlEncoded
+            @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @POST(VERSION + "/load_balancers/{id}/remove_listeners")
     LoadBalancer removeListenersFromLoadBalancer(
             @Path("id") @Nonnull String id,
-            @Field("listeners") @Nonnull List<LoadBalancerListener> listeners) throws CloudException;
+            @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @DELETE(VERSION + "/load_balancers/{id}")
     Response deleteLoadBalancer(@Path("id") String id) throws CloudException;
 

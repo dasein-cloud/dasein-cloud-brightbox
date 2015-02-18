@@ -65,13 +65,13 @@ public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBo
 
     @Override
     public void addServers(@Nonnull String toLoadBalancerId, @Nonnull String... serverIdsToAdd) throws CloudException, InternalException {
-        CreateLoadBalancer clb = new CreateLoadBalancer();
         List<LoadBalancerNode> nodes = new ArrayList<LoadBalancerNode>();
         for( String serverId : serverIdsToAdd ) {
             nodes.add(new LoadBalancerNode(serverId));
         }
+        CreateLoadBalancer clb = new CreateLoadBalancer();
         clb.setNodes(nodes);
-        getProvider().getCloudApiService().updateLoadBalancer(toLoadBalancerId, clb);
+        getProvider().getCloudApiService().addNodesToLoadBalancer(toLoadBalancerId, clb);
     }
 
     @Override
@@ -80,14 +80,13 @@ public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBo
         if( listeners == null ) {
             return;
         }
-        org.dasein.cloud.brightbox.api.model.LoadBalancer lb = getProvider().getCloudApiService().getLoadBalancer(toLoadBalancerId);
-        CreateLoadBalancer clb = new CreateLoadBalancer();
-        List<LoadBalancerListener> listenerList = new ArrayList<LoadBalancerListener>(lb.getListeners());
+        List<LoadBalancerListener> listenerList = new ArrayList<LoadBalancerListener>();
         for( LbListener listener : listeners ) {
             listenerList.add(new LoadBalancerListener(listener.getPrivatePort(), listener.getPublicPort(), toBBProtocol(listener.getNetworkProtocol()), null));
         }
+        CreateLoadBalancer clb = new CreateLoadBalancer();
         clb.setListeners(listenerList);
-        getProvider().getCloudApiService().updateLoadBalancer(toLoadBalancerId, clb);
+        getProvider().getCloudApiService().addListenersToLoadBalancer(toLoadBalancerId, clb);
     }
 
     @Override
@@ -299,44 +298,24 @@ LoadBalancerAddressType.IP, lb.getUrl(), lb.getId(), ports).withListeners(listen
 
     @Override
     public void removeListeners(@Nonnull String fromLoadBalancerId, @Nullable LbListener[] listeners) throws CloudException, InternalException {
-        CreateLoadBalancer lb = toCreateLoadBalancer(getProvider().getCloudApiService().getLoadBalancer(fromLoadBalancerId));
-        List<LoadBalancerListener> listenersToKeep = new ArrayList<LoadBalancerListener>();
-        for( LoadBalancerListener l : lb.getListeners() ) {
-            boolean found = false;
-            for( LbListener remove : listeners ) {
-                if( l.getIn() == remove.getPrivatePort() && l.getOut() == remove.getPublicPort() && l.getProtocol().equals(toBBProtocol(remove.getNetworkProtocol())) ) {
-                    found = true;
-                    break;
-                }
-            }
-            if( !found ) {
-                listenersToKeep.add(l);
-            }
+        List<LoadBalancerListener> removeListeners = new ArrayList<LoadBalancerListener>();
+        for( LbListener l : listeners ) {
+            removeListeners.add(new LoadBalancerListener(l.getPrivatePort(), l.getPublicPort(), toBBProtocol(l.getNetworkProtocol()), 0));
         }
-        lb.setListeners(listenersToKeep);
-        getProvider().getCloudApiService().updateLoadBalancer(fromLoadBalancerId, lb);
-//        List<LoadBalancerListener> removeListeners = new ArrayList<LoadBalancerListener>();
-//        for( LbListener l : listeners ) {
-//            removeListeners.add(new LoadBalancerListener(l.getPrivatePort(), l.getPublicPort(), toBBProtocol(l.getNetworkProtocol()), 0));
-//        }
-//        getProvider().getCloudApiService().removeListenersFromLoadBalancer(fromLoadBalancerId, removeListeners);
+        CreateLoadBalancer lb = new CreateLoadBalancer();
+        lb.setListeners(removeListeners);
+        getProvider().getCloudApiService().removeListenersFromLoadBalancer(fromLoadBalancerId, lb);
     }
 
     @Override
     public void removeServers(@Nonnull String fromLoadBalancerId, @Nonnull String... serverIdsToRemove) throws CloudException, InternalException {
-        CreateLoadBalancer lb = toCreateLoadBalancer(getProvider().getCloudApiService().getLoadBalancer(fromLoadBalancerId));
         List<LoadBalancerNode> nodes = new ArrayList<LoadBalancerNode>();
-        for( LoadBalancerNode server : lb.getNodes() ) {
-            if( Arrays.binarySearch(serverIdsToRemove, server.getNode(), new Comparator<String>() {
-                @Override public int compare(String o1, String o2) {
-                    return o1.compareTo(o2);
-                }
-            }) < 0 ) {
-                nodes.add(server);
-            }
+        for(String id : serverIdsToRemove ) {
+            nodes.add(new LoadBalancerNode(id));
         }
+        CreateLoadBalancer lb = new CreateLoadBalancer();
         lb.setNodes(nodes);
-        getProvider().getCloudApiService().updateLoadBalancer(fromLoadBalancerId, lb);
+        getProvider().getCloudApiService().removeNodesFromLoadBalancer(fromLoadBalancerId, lb);
     }
 
     @Override
