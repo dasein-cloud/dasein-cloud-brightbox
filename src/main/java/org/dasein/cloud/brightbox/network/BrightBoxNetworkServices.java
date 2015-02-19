@@ -18,12 +18,10 @@
 
 package org.dasein.cloud.brightbox.network;
 
-import org.dasein.cloud.CloudProvider;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
 import org.dasein.cloud.network.AbstractNetworkServices;
 import org.dasein.cloud.network.IpAddressSupport;
 import org.dasein.cloud.network.LoadBalancerSupport;
-import org.dasein.cloud.network.NetworkServices;
 
 import javax.annotation.Nullable;
 
@@ -39,11 +37,11 @@ public class BrightBoxNetworkServices extends AbstractNetworkServices {
 
     @Override
     public @Nullable LoadBalancerSupport getLoadBalancerSupport() {
-        return new BrightBoxLoadBalancers(provider);
+        return new BrightBoxLoadBalancerSupport(provider);
     }
 
     @Override
     public @Nullable IpAddressSupport getIpAddressSupport() {
-        return super.getIpAddressSupport();
+        return new BrightBoxIpAddressSupport(provider);
     }
 }

@@ -61,9 +61,9 @@ import java.util.List;
 /**
  * Created by stas on 13/02/2015.
  */
-public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBoxCloud> {
+public class BrightBoxLoadBalancerSupport extends AbstractLoadBalancerSupport<BrightBoxCloud> {
 
-    public BrightBoxLoadBalancers(BrightBoxCloud provider) {
+    public BrightBoxLoadBalancerSupport(BrightBoxCloud provider) {
         super(provider);
     }
 
@@ -195,7 +195,14 @@ public class BrightBoxLoadBalancers extends AbstractLoadBalancerSupport<BrightBo
 
     @Override
     public @Nullable LoadBalancer getLoadBalancer(@Nonnull String loadBalancerId) throws CloudException, InternalException {
-        return toLoadBalancer(getProvider().getCloudApiService().getLoadBalancer(loadBalancerId));
+        try{
+            return toLoadBalancer(getProvider().getCloudApiService().getLoadBalancer(loadBalancerId));
+        } catch( CloudException e ) {
+            if( e.getHttpCode() == 404 ) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     private LoadBalancer toLoadBalancer(org.dasein.cloud.brightbox.api.model.LoadBalancer lb) throws InternalException, CloudException {
@@ -261,16 +268,13 @@ LoadBalancerAddressType.IP, lb.getUrl(), lb.getId(), ports).withListeners(listen
     private Iterable<LoadBalancerEndpoint> toLoadBalancerEndpoints(@Nonnull List<Server> nodes, @Nullable String [] filterIds) {
         List<LoadBalancerEndpoint> endpoints = new ArrayList<LoadBalancerEndpoint>();
         for( Server server : nodes ) {
-            boolean matches;
+            boolean matches = true;
             if( filterIds != null ) {
                 matches = Arrays.binarySearch(filterIds, server.getId(), new Comparator<String>() {
                     @Override public int compare(String o1, String o2) {
                         return o1.compareTo(o2);
                     }
                 }) >= 0;
-            }
-            else {
-                matches = true;
             }
             if( matches ) {
                 endpoints.add(LoadBalancerEndpoint.getInstance(LbEndpointType.VM, server.getId(), "active".equals(server.getStatus()) ? LbEndpointState.ACTIVE : LbEndpointState.INACTIVE));

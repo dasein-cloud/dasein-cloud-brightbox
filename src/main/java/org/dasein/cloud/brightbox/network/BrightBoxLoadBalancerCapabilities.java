@@ -143,7 +143,7 @@ public class BrightBoxLoadBalancerCapabilities extends AbstractCapabilities<Brig
     @Override
     public @Nonnull Iterable<LbPersistence> listSupportedPersistenceOptions() throws CloudException, InternalException {
         if( persistences == null ) {
-            persistences = Collections.unmodifiableList(Arrays.asList(LbPersistence.COOKIE));
+            persistences = Collections.unmodifiableList(Arrays.asList(LbPersistence.NONE));
         }
         return persistences;
     }

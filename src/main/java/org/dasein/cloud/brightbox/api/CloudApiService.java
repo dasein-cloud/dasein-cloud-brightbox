@@ -19,7 +19,10 @@
 package org.dasein.cloud.brightbox.api;
 
 import org.dasein.cloud.CloudException;
+import org.dasein.cloud.brightbox.api.model.CloudIp;
+import org.dasein.cloud.brightbox.api.model.CreateCloudIp;
 import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
+import org.dasein.cloud.brightbox.api.model.DatabaseServerType;
 import org.dasein.cloud.brightbox.api.model.Image;
 import org.dasein.cloud.brightbox.api.model.LoadBalancer;
 import org.dasein.cloud.brightbox.api.model.Server;
@@ -76,9 +79,9 @@ public interface CloudApiService {
     @GET(VERSION + "/load_balancers") List<LoadBalancer> listLoadBalancers() throws CloudException;
     @POST(VERSION + "/load_balancers")
     LoadBalancer createLoadBalancer(@Body CreateLoadBalancer loadBalancer) throws CloudException;
-    @GET(VERSION + "/load_balancers/{id}") LoadBalancer getLoadBalancer(@Path("id") String id) throws CloudException;
+    @GET(VERSION + "/load_balancers/{id}") LoadBalancer getLoadBalancer(@Path("id") @Nonnull String id) throws CloudException;
     @PUT(VERSION + "/load_balancers/{id}")
-    LoadBalancer updateLoadBalancer(@Path("id") @Nonnull String id, @Body CreateLoadBalancer loadBalancer) throws CloudException;
+    LoadBalancer updateLoadBalancer(@Path("id") @Nonnull String id, @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @FormUrlEncoded
     @POST(VERSION + "/load_balancers/{id}/add_nodes")
     LoadBalancer addNodesToLoadBalancer(
@@ -97,6 +100,27 @@ public interface CloudApiService {
             @Path("id") @Nonnull String id,
             @Body @Nonnull CreateLoadBalancer loadBalancer) throws CloudException;
     @DELETE(VERSION + "/load_balancers/{id}")
-    Response deleteLoadBalancer(@Path("id") String id) throws CloudException;
+    Response deleteLoadBalancer(@Path("id") @Nonnull String id) throws CloudException;
 
+    // cloud ips
+    @GET(VERSION + "/cloud_ips")
+    List<CloudIp> listCloudIps() throws CloudException;
+    @POST(VERSION + "/cloud_ips")
+    CloudIp createCloudIp(@Body @Nonnull CreateCloudIp cloudIp) throws CloudException;
+    @GET(VERSION + "/cloud_ips/{id}")
+    CloudIp getCloudIp(@Path("id") @Nonnull String id) throws CloudException;
+    @PUT(VERSION + "/clouds_ups/{id}")
+    CloudIp updateCloudIp(@Path("id") @Nonnull String id, @Body @Nonnull CreateCloudIp cloudIp) throws CloudException;
+    @DELETE(VERSION + "/cloud_ips/{id}")
+    Response deleteCloudIp(@Path("id") @Nonnull String id) throws CloudException;
+    @FormUrlEncoded @POST(VERSION + "/cloud_ups/{id}/map")
+    Response mapCloudIp(@Path("id") @Nonnull String id, @Field("destination") @Nonnull String destinationId) throws CloudException;
+    @FormUrlEncoded @POST(VERSION + "/cloud_ups/{id}/unmap")
+    Response unmapCloudIp(@Path("id") @Nonnull String id) throws CloudException;
+
+    // database server types
+    @GET(VERSION + "/database_types")
+    List<DatabaseServerType> listDatabaseServerTypes() throws CloudException;
+    @GET(VERSION + "/database_types/{id}")
+    DatabaseServerType getDatabaseServerType(@Path("id") @Nonnull String id) throws CloudException;
 }
