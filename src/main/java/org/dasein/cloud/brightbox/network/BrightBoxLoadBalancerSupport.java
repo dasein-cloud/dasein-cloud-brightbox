@@ -105,10 +105,6 @@ public class BrightBoxLoadBalancerSupport extends AbstractLoadBalancerSupport<Br
 
     @Override
     public boolean isSubscribed() throws CloudException, InternalException {
-        if( getContext() == null ) {
-            throw new CloudException("No valid context is established for this request");
-        }
-
         try {
             getProvider().getCloudApiService().listLoadBalancers();
             return true;

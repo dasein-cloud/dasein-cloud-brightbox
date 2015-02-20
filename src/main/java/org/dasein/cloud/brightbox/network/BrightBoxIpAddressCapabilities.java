@@ -73,7 +73,7 @@ public class BrightBoxIpAddressCapabilities extends AbstractCapabilities<BrightB
 
     @Override
     public boolean isForwarding(IPVersion version) throws CloudException, InternalException {
-        return false;
+        return IPVersion.IPV4.equals(version);
     }
 
     @Override

@@ -135,6 +135,10 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
         vm.setProductId(server.getServerType().getId());
 //        vm.setArchitecture(server.getImage().getArch());
         vm.setCurrentState(toVmState(server.getStatus()));
+        if( server.getCloudIps() != null && server.getCloudIps().size() > 0 ) {
+            // FIXME: this only selects the first ip address, which is crap
+            vm.setProviderAssignedIpAddressId(server.getCloudIps().get(0).getId());
+        }
         return vm;
     }
 

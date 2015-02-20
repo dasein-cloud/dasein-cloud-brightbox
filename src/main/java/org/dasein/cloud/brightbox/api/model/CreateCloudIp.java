@@ -28,6 +28,9 @@ public class CreateCloudIp {
     private String               name;
     private List<PortTranslator> portTranslators;
 
+    public CreateCloudIp() {
+    }
+
     public CreateCloudIp(String reverseDns, String name, List<PortTranslator> portTranslators) {
         this.reverseDns = reverseDns;
         this.name = name;

@@ -20,6 +20,7 @@ package org.dasein.cloud.brightbox.api;
 
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.brightbox.api.model.CloudIp;
+import org.dasein.cloud.brightbox.api.model.CloudIpDestination;
 import org.dasein.cloud.brightbox.api.model.CreateCloudIp;
 import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
 import org.dasein.cloud.brightbox.api.model.DatabaseServerType;
@@ -109,13 +110,13 @@ public interface CloudApiService {
     CloudIp createCloudIp(@Body @Nonnull CreateCloudIp cloudIp) throws CloudException;
     @GET(VERSION + "/cloud_ips/{id}")
     CloudIp getCloudIp(@Path("id") @Nonnull String id) throws CloudException;
-    @PUT(VERSION + "/clouds_ups/{id}")
+    @PUT(VERSION + "/cloud_ips/{id}")
     CloudIp updateCloudIp(@Path("id") @Nonnull String id, @Body @Nonnull CreateCloudIp cloudIp) throws CloudException;
     @DELETE(VERSION + "/cloud_ips/{id}")
     Response deleteCloudIp(@Path("id") @Nonnull String id) throws CloudException;
-    @FormUrlEncoded @POST(VERSION + "/cloud_ups/{id}/map")
-    Response mapCloudIp(@Path("id") @Nonnull String id, @Field("destination") @Nonnull String destinationId) throws CloudException;
-    @FormUrlEncoded @POST(VERSION + "/cloud_ups/{id}/unmap")
+    @POST(VERSION + "/cloud_ips/{id}/map")
+    Response mapCloudIp(@Path("id") @Nonnull String id, @Body @Nonnull CloudIpDestination destination) throws CloudException;
+    @POST(VERSION + "/cloud_ips/{id}/unmap")
     Response unmapCloudIp(@Path("id") @Nonnull String id) throws CloudException;
 
     // database server types

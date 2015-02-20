@@ -18,6 +18,8 @@
 
 package org.dasein.cloud.brightbox.api.model;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.List;
 
 /**
@@ -31,6 +33,12 @@ public class CloudIp {
     private String               reverseDns;
     private String               name;
     private List<PortTranslator> portTranslators;
+    private Account account;
+    @SerializedName("interface")
+    private Interface _interface;
+    private Server server;
+    private LoadBalancer loadBalancer;
+    private DatabaseServer databaseServer;
 
     public String getId() {
         return id;
@@ -87,4 +95,45 @@ public class CloudIp {
     public void setPortTranslators(List<PortTranslator> portTranslators) {
         this.portTranslators = portTranslators;
     }
+
+    public Account getAccount() {
+        return account;
+    }
+
+    public void setAccount(Account account) {
+        this.account = account;
+    }
+
+    public Interface getInterface() {
+        return _interface;
+    }
+
+    public void setInterface(Interface _interface) {
+        this._interface = _interface;
+    }
+
+    public Server getServer() {
+        return server;
+    }
+
+    public void setServer(Server server) {
+        this.server = server;
+    }
+
+    public LoadBalancer getLoadBalancer() {
+        return loadBalancer;
+    }
+
+    public void setLoadBalancer(LoadBalancer loadBalancer) {
+        this.loadBalancer = loadBalancer;
+    }
+
+    public DatabaseServer getDatabaseServer() {
+        return databaseServer;
+    }
+
+    public void setDatabaseServer(DatabaseServer databaseServer) {
+        this.databaseServer = databaseServer;
+    }
 }
+

@@ -19,40 +19,20 @@
 package org.dasein.cloud.brightbox.api.model;
 
 /**
- * Created by stas on 10/02/2015.
+ * Created by stas on 20/02/2015.
  */
-public class PortTranslator {
-    private int incoming;
-    private int outgoing;
-    private String protocol;
+public class CloudIpDestination {
+    private String destination;
 
-    public PortTranslator(int incoming, int outgoing, String protocol) {
-        this.incoming = incoming;
-        this.outgoing = outgoing;
-        this.protocol = protocol;
+    public CloudIpDestination(String destination) {
+        this.destination = destination;
     }
 
-    public int getIncoming() {
-        return incoming;
+    public String getDestination() {
+        return destination;
     }
 
-    public void setIncoming(int incoming) {
-        this.incoming = incoming;
-    }
-
-    public int getOutgoing() {
-        return outgoing;
-    }
-
-    public void setOutgoing(int outgoing) {
-        this.outgoing = outgoing;
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
+    public void setDestination(String destination) {
+        this.destination = destination;
     }
 }
