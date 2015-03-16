@@ -18,8 +18,6 @@
 
 package org.dasein.cloud.brightbox.network;
 
-import org.bouncycastle.util.IPAddress;
-import org.dasein.cloud.Cloud;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.ResourceStatus;
@@ -40,7 +38,6 @@ import org.dasein.cloud.network.Protocol;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import javax.naming.OperationNotSupportedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Future;

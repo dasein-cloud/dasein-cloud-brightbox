@@ -84,4 +84,20 @@ public class FirewallPolicy {
     public void setCreatedAt(Date createdAt) {
         this.createdAt = createdAt;
     }
+
+    public ServerGroup getServerGroup() {
+        return serverGroup;
+    }
+
+    public void setServerGroup(ServerGroup serverGroup) {
+        this.serverGroup = serverGroup;
+    }
+
+    public List<FirewallRule> getRules() {
+        return rules;
+    }
+
+    public void setRules(List<FirewallRule> rules) {
+        this.rules = rules;
+    }
 }

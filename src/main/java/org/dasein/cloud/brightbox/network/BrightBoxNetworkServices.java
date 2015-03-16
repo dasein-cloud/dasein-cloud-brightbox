@@ -20,6 +20,7 @@ package org.dasein.cloud.brightbox.network;
 
 import org.dasein.cloud.brightbox.BrightBoxCloud;
 import org.dasein.cloud.network.AbstractNetworkServices;
+import org.dasein.cloud.network.FirewallSupport;
 import org.dasein.cloud.network.IpAddressSupport;
 import org.dasein.cloud.network.LoadBalancerSupport;
 
@@ -43,5 +44,10 @@ public class BrightBoxNetworkServices extends AbstractNetworkServices {
     @Override
     public @Nullable IpAddressSupport getIpAddressSupport() {
         return new BrightBoxIpAddressSupport(provider);
+    }
+
+    @Override
+    public @Nullable FirewallSupport getFirewallSupport() {
+        return new BrightBoxFirewallSupport(provider);
     }
 }

@@ -91,7 +91,7 @@ public class BrightBoxVmCapabilities extends AbstractCapabilities<BrightBoxCloud
 
     @Override
     public boolean canTerminate(@Nonnull VmState fromState) throws CloudException, InternalException {
-        return VmState.RUNNING.equals(fromState) || VmState.STOPPED.equals(fromState);
+        return VmState.RUNNING.equals(fromState) || VmState.STOPPED.equals(fromState) || VmState.ERROR.equals(fromState);
     }
 
     @Override
@@ -208,6 +208,11 @@ public class BrightBoxVmCapabilities extends AbstractCapabilities<BrightBoxCloud
 
     @Override
     public boolean supportsSpotVirtualMachines() throws InternalException, CloudException {
+        return false;
+    }
+
+    @Override
+    public boolean supportsClientRequestToken() throws InternalException, CloudException {
         return false;
     }
 

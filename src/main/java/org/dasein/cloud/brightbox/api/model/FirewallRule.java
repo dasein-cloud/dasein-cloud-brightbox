@@ -34,7 +34,7 @@ public class FirewallRule {
     private String         icmpTypeName;
     private String         description;
     private Date           createdAt;
-    private FirewallPolicy policy;
+    private FirewallPolicy firewallPolicy;
 
     public String getId() {
         return id;
@@ -116,11 +116,11 @@ public class FirewallRule {
         this.createdAt = createdAt;
     }
 
-    public FirewallPolicy getPolicy() {
-        return policy;
+    public FirewallPolicy getFirewallPolicy() {
+        return firewallPolicy;
     }
 
-    public void setPolicy(FirewallPolicy policy) {
-        this.policy = policy;
+    public void setFirewallPolicy(FirewallPolicy firewallPolicy) {
+        this.firewallPolicy = firewallPolicy;
     }
 }

@@ -24,11 +24,14 @@ import org.dasein.cloud.brightbox.api.model.CloudIpDestination;
 import org.dasein.cloud.brightbox.api.model.CreateCloudIp;
 import org.dasein.cloud.brightbox.api.model.CreateLoadBalancer;
 import org.dasein.cloud.brightbox.api.model.DatabaseServerType;
+import org.dasein.cloud.brightbox.api.model.FirewallPolicy;
+import org.dasein.cloud.brightbox.api.model.FirewallRule;
 import org.dasein.cloud.brightbox.api.model.Image;
 import org.dasein.cloud.brightbox.api.model.LoadBalancer;
 import org.dasein.cloud.brightbox.api.model.Server;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.brightbox.api.model.Zone;
+import org.dasein.cloud.network.Firewall;
 import retrofit.client.Response;
 import retrofit.http.Body;
 import retrofit.http.DELETE;
@@ -62,6 +65,7 @@ public interface CloudApiService {
     @POST(VERSION + "/servers")
     Server createServer(@Field("image") @Nonnull String imageId, @Field("name") @Nullable String name, @Field("server_type") @Nullable String serverTypeId, @Field("zone") @Nullable String zone, @Field("user_data") @Nullable String userData, @Field("server_groups") @Nullable List<String> serverGroupIds) throws CloudException;
 
+    @GET(VERSION + "/servers") List<Server> listServers() throws CloudException;
     @GET(VERSION + "/servers/{id}") Server getServer(@Path("id") String id) throws CloudException;
     @PUT(VERSION + "/servers/{id}") Server updateServer(@Path("id") String id, @Nullable String name, @Nullable String userData, @Nullable String compatibilityMode) throws CloudException;
     @DELETE(VERSION + "/servers/{id}") Response deleteServer(@Path("id") String id) throws CloudException;
@@ -124,4 +128,27 @@ public interface CloudApiService {
     List<DatabaseServerType> listDatabaseServerTypes() throws CloudException;
     @GET(VERSION + "/database_types/{id}")
     DatabaseServerType getDatabaseServerType(@Path("id") @Nonnull String id) throws CloudException;
+
+    // firewall
+    final String FIREWALL_POLICIES = VERSION + "/firewall_policies";
+    final String FIREWALL_POLICIES_ID = FIREWALL_POLICIES + "/{id}";
+    @GET(FIREWALL_POLICIES)
+    List<FirewallPolicy> listFirewallPolicies() throws CloudException;
+    @GET(FIREWALL_POLICIES_ID)
+    FirewallPolicy getFirewallPolicy(@Path("id") @Nonnull String id) throws CloudException;
+    @PUT(FIREWALL_POLICIES_ID)
+    FirewallPolicy updateFirewallPolicy(@Path("id") @Nonnull String id, @Body @Nonnull FirewallPolicy policy) throws CloudException;
+    @POST(FIREWALL_POLICIES)
+    FirewallPolicy createFirewallPolicy(@Body @Nonnull FirewallPolicy policy) throws CloudException;
+    @DELETE(FIREWALL_POLICIES_ID)
+    Response deleteFirewallPolicy(@Path("id") @Nonnull String id) throws CloudException;
+
+    final String FIREWALL_RULES = VERSION + "/firewall_rules";
+    final String FIREWALL_RULES_ID = FIREWALL_RULES + "/{id}";
+    @GET(FIREWALL_RULES_ID)
+    FirewallRule getFirewallRule(@Path("id") @Nonnull String id) throws CloudException;
+    @PUT(FIREWALL_RULES_ID)
+    FirewallRule updateFirewallRule(@Path("id") @Nonnull String id, @Body @Nonnull FirewallRule rule) throws CloudException;
+    @DELETE(FIREWALL_RULES_ID)
+    Response deleteFirewallRule(@Path("id") @Nonnull String id) throws CloudException;
 }

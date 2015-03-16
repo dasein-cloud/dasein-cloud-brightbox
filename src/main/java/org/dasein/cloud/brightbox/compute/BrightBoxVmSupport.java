@@ -20,6 +20,7 @@ package org.dasein.cloud.brightbox.compute;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.util.encoders.Base64Encoder;
+import org.dasein.cloud.Cloud;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
@@ -27,6 +28,8 @@ import org.dasein.cloud.brightbox.api.model.Server;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.compute.AbstractVMSupport;
 import org.dasein.cloud.compute.Architecture;
+import org.dasein.cloud.compute.Platform;
+import org.dasein.cloud.compute.VMFilterOptions;
 import org.dasein.cloud.compute.VMLaunchOptions;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VirtualMachineCapabilities;
@@ -83,11 +86,21 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
         return products;
     }
 
+    @Override
+    public @Nonnull Iterable<VirtualMachine> listVirtualMachines() throws InternalException, CloudException {
+        List<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>();
+        for( Server server : getProvider().getCloudApiService().listServers() ) {
+            virtualMachines.add(toVirtualMachine(server));
+        }
+        return virtualMachines;
+    }
+
     private VirtualMachineProduct toVmProduct(ServerType type) {
         VirtualMachineProduct product = new VirtualMachineProduct();
         product.setName(type.getName());
+        product.setDescription(type.getName());
         product.setProviderProductId(type.getId());
-        product.setArchitectures(Arrays.asList(Architecture.I64, Architecture.I32));
+        product.setArchitectures(Architecture.I64, Architecture.I32);
         product.setCpuCount(type.getCores());
         product.setRamSize(new Storage<Megabyte>(type.getRam(), Storage.MEGABYTE));
         product.setRootVolumeSize(new Storage<Megabyte>(type.getDiskSize(), Storage.MEGABYTE));
@@ -117,7 +130,37 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
 
     @Override
     public @Nullable VirtualMachine getVirtualMachine(@Nonnull String vmId) throws InternalException, CloudException {
-        return toVirtualMachine(getProvider().getCloudApiService().getServer(vmId));
+        try {
+            return toVirtualMachine(getProvider().getCloudApiService().getServer(vmId));
+        } catch( CloudException e ) {
+            if( e.getHttpCode() == 404 ) {
+                return null;
+            }
+            throw e;
+        }
+    }
+
+    @Override
+    public @Nullable String getUserData(@Nonnull String vmId) throws InternalException, CloudException {
+        Server server = getProvider().getCloudApiService().getServer(vmId);
+        if( server != null && server.getUserData() != null ) {
+            try {
+                return new String(Base64.decodeBase64(server.getUserData().getBytes("utf-8")), "utf-8");
+            }
+            catch( UnsupportedEncodingException e ) {
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void start(@Nonnull String vmId) throws InternalException, CloudException {
+        getProvider().getCloudApiService().startServer(vmId);
+    }
+
+    @Override
+    public void stop(@Nonnull String vmId, boolean force) throws InternalException, CloudException {
+        getProvider().getCloudApiService().stopServer(vmId);
     }
 
     private VirtualMachine toVirtualMachine(Server server) throws CloudException {
@@ -127,13 +170,32 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
         VirtualMachine vm = new VirtualMachine();
         vm.setProviderVirtualMachineId(server.getId());
         vm.setName(server.getName());
+        vm.setDescription(server.getName());
         vm.setCreationTimestamp(server.getCreatedAt().getTime());
         vm.setProviderOwnerId(server.getAccount().getId());
-        vm.setProviderDataCenterId(server.getZone().getId());
+        if( server.getZone() != null ) { // shouldn't be null according to the docs, but i've seen it
+            vm.setProviderDataCenterId(server.getZone().getId());
+        }
         vm.setProviderRegionId(getContext().getRegionId());
         vm.setProviderMachineImageId(server.getImage().getId());
         vm.setProductId(server.getServerType().getId());
-//        vm.setArchitecture(server.getImage().getArch());
+        if( "i686".equalsIgnoreCase(server.getImage().getArch()) ) {
+            vm.setArchitecture(Architecture.I32);
+        }
+        else {
+            vm.setArchitecture(Architecture.I64);
+
+        }
+        vm.setPlatform(Platform.guess(vm.getName()));
+        if( vm.getPlatform() == null ) {
+            vm.setPlatform(Platform.guess(server.getImage().getName()));
+        }
+        if( vm.getPlatform() == null ) {
+            vm.setPlatform(Platform.guess(server.getImage().getDescription()));
+        }
+        if( vm.getPlatform() == null ) {
+            vm.setPlatform(Platform.guess(server.getImage().getSource()));
+        }
         vm.setCurrentState(toVmState(server.getStatus()));
         if( server.getCloudIps() != null && server.getCloudIps().size() > 0 ) {
             // FIXME: this only selects the first ip address, which is crap
