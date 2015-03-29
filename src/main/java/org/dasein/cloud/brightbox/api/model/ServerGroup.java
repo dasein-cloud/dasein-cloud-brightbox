@@ -20,17 +20,21 @@ package org.dasein.cloud.brightbox.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.util.List;
+
 /**
  * Created by stas on 10/02/2015.
  */
 public class ServerGroup {
-    private String id;
-    private String url;
-    private String name;
-    private String createdAt;
-    private String description;
+    private String         id;
+    private String         url;
+    private String         name;
+    private String         createdAt;
+    private String         description;
     @SerializedName("default")
-    private boolean defaultGroup;
+    private boolean        defaultGroup;
+    private FirewallPolicy firewallPolicy;
+    private List<Server>   servers;
 
     public String getId() {
         return id;
@@ -78,5 +82,38 @@ public class ServerGroup {
 
     public void setDefault(boolean defaultGroup) {
         this.defaultGroup = defaultGroup;
+    }
+
+    public FirewallPolicy getFirewallPolicy() {
+        return firewallPolicy;
+    }
+
+    public void setFirewallPolicy(FirewallPolicy firewallPolicy) {
+        this.firewallPolicy = firewallPolicy;
+    }
+
+    public List<Server> getServers() {
+        return servers;
+    }
+
+    public void setServers(List<Server> servers) {
+        this.servers = servers;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if( this == o ) return true;
+        if( o == null || getClass() != o.getClass() ) return false;
+
+        ServerGroup that = ( ServerGroup ) o;
+
+        if( !id.equals(that.id) ) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

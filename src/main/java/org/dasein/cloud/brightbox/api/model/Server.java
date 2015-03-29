@@ -19,6 +19,7 @@
 package org.dasein.cloud.brightbox.api.model;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -227,6 +228,9 @@ public class Server {
     }
 
     public List<ServerGroup> getServerGroups() {
+        if( serverGroups == null ) {
+            serverGroups = new ArrayList<ServerGroup>();
+        }
         return serverGroups;
     }
 

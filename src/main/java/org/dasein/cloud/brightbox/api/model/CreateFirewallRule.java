@@ -25,7 +25,7 @@ import java.util.Date;
 /**
  * Created by stas on 19/02/2015.
  */
-public class FirewallRule {
+public class CreateFirewallRule {
     private String         id;
     private String         url;
     private String         source;
@@ -36,7 +36,8 @@ public class FirewallRule {
     private String         icmpTypeName;
     private String         description;
     private Date           createdAt;
-    private FirewallPolicy firewallPolicy;
+    @SerializedName("firewall_policy")
+    private String         firewallPolicyId;
 
     public String getId() {
         return id;
@@ -44,6 +45,14 @@ public class FirewallRule {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public String getFirewallPolicyId() {
+        return firewallPolicyId;
+    }
+
+    public void setFirewallPolicyId(String firewallPolicyId) {
+        this.firewallPolicyId = firewallPolicyId;
     }
 
     public String getUrl() {
@@ -118,11 +127,4 @@ public class FirewallRule {
         this.createdAt = createdAt;
     }
 
-    public FirewallPolicy getFirewallPolicy() {
-        return firewallPolicy;
-    }
-
-    public void setFirewallPolicy(FirewallPolicy firewallPolicy) {
-        this.firewallPolicy = firewallPolicy;
-    }
 }

@@ -19,37 +19,34 @@
 package org.dasein.cloud.brightbox.compute;
 
 import org.apache.commons.codec.binary.Base64;
-import org.bouncycastle.util.encoders.Base64Encoder;
-import org.dasein.cloud.Cloud;
 import org.dasein.cloud.CloudException;
 import org.dasein.cloud.InternalException;
 import org.dasein.cloud.brightbox.BrightBoxCloud;
+import org.dasein.cloud.brightbox.api.model.CreateServer;
 import org.dasein.cloud.brightbox.api.model.Server;
+import org.dasein.cloud.brightbox.api.model.ServerGroup;
+import org.dasein.cloud.brightbox.api.model.ServerGroupServer;
 import org.dasein.cloud.brightbox.api.model.ServerType;
 import org.dasein.cloud.compute.AbstractVMSupport;
 import org.dasein.cloud.compute.Architecture;
 import org.dasein.cloud.compute.Platform;
-import org.dasein.cloud.compute.VMFilterOptions;
 import org.dasein.cloud.compute.VMLaunchOptions;
 import org.dasein.cloud.compute.VirtualMachine;
 import org.dasein.cloud.compute.VirtualMachineCapabilities;
 import org.dasein.cloud.compute.VirtualMachineProduct;
 import org.dasein.cloud.compute.VirtualMachineProductFilterOptions;
-import org.dasein.cloud.compute.VirtualMachineSupport;
 import org.dasein.cloud.compute.VmState;
-import org.dasein.util.uom.storage.Gigabyte;
 import org.dasein.util.uom.storage.Megabyte;
 import org.dasein.util.uom.storage.Storage;
-import org.dasein.util.uom.storage.StorageUnit;
-import retrofit.client.Response;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by stas on 10/02/2015.
@@ -88,9 +85,10 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
 
     @Override
     public @Nonnull Iterable<VirtualMachine> listVirtualMachines() throws InternalException, CloudException {
-        List<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>();
+        final List<VirtualMachine> virtualMachines = new ArrayList<VirtualMachine>();
+        final List<ServerGroup> serverGroups = getProvider().getCloudApiService().listServerGroups();
         for( Server server : getProvider().getCloudApiService().listServers() ) {
-            virtualMachines.add(toVirtualMachine(server));
+            virtualMachines.add(toVirtualMachine(server, serverGroups));
         }
         return virtualMachines;
     }
@@ -116,22 +114,47 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
     }
 
     @Override
-    public @Nonnull VirtualMachine launch(@Nonnull VMLaunchOptions withLaunchOptions) throws CloudException, InternalException {
+    public @Nonnull VirtualMachine launch(@Nonnull VMLaunchOptions opts) throws CloudException, InternalException {
+        final List<ServerGroup> serverGroups = getProvider().getCloudApiService().listServerGroups();
+        final Map<String, String> targetGroupIds = new HashMap<String, String>();
+        if( opts.getFirewallIds().length > 0 ) {
+            for( String firewallId : opts.getFirewallIds() ) {
+                boolean existingGroup = false;
+                for( ServerGroup group : serverGroups ) {
+                    if( group.getFirewallPolicy() == null ) {
+                        continue;
+                    }
+                    if( firewallId.equals(group.getFirewallPolicy().getId()) ) {
+                        existingGroup = true;
+                        targetGroupIds.put(group.getId(), group.getId());
+                        break;
+                    }
+                }
+                if( !existingGroup ) {
+                    final ServerGroup newGroup = getProvider().getCloudApiService().createServerGroup(firewallId, "Group for "+firewallId);
+                    targetGroupIds.put(newGroup.getId(), newGroup.getId());
+                    getProvider().getCloudApiService().applyFirewallPolicyToServerGroup(firewallId, newGroup.getId());
+                }
+            }
+        }
         String userData = null;
-        if( withLaunchOptions.getUserData() != null ) {
+        if( opts.getUserData() != null ) {
             try {
-                userData = Base64.encodeBase64String(withLaunchOptions.getUserData().getBytes("utf-8"));
+                userData = Base64.encodeBase64String(opts.getUserData().getBytes("utf-8"));
             }
             catch( UnsupportedEncodingException ignore ) { }
         }
-        Server server = getProvider().getCloudApiService().createServer(withLaunchOptions.getMachineImageId(), withLaunchOptions.getFriendlyName(), withLaunchOptions.getStandardProductId(), withLaunchOptions.getDataCenterId(), userData, null);
-        return toVirtualMachine(server);
+
+        Server server = getProvider().getCloudApiService().createServer(
+                new CreateServer(opts.getMachineImageId()).withName(opts.getFriendlyName()).withServerTypeId(opts.getStandardProductId()).withZone(opts.getDataCenterId()).withUserData(userData).withServerGroupIds(new ArrayList<String>(targetGroupIds.values()))
+        );
+        return toVirtualMachine(server, serverGroups);
     }
 
     @Override
     public @Nullable VirtualMachine getVirtualMachine(@Nonnull String vmId) throws InternalException, CloudException {
         try {
-            return toVirtualMachine(getProvider().getCloudApiService().getServer(vmId));
+            return toVirtualMachine(getProvider().getCloudApiService().getServer(vmId), getProvider().getCloudApiService().listServerGroups());
         } catch( CloudException e ) {
             if( e.getHttpCode() == 404 ) {
                 return null;
@@ -163,7 +186,7 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
         getProvider().getCloudApiService().stopServer(vmId);
     }
 
-    private VirtualMachine toVirtualMachine(Server server) throws CloudException {
+    private VirtualMachine toVirtualMachine(@Nullable Server server, @Nonnull List<ServerGroup> globalServerGroups) throws CloudException, InternalException {
         if( server == null ) {
             return null;
         }
@@ -186,14 +209,22 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
             vm.setArchitecture(Architecture.I64);
 
         }
+        List<ServerGroup> vmServerGroups = server.getServerGroups();
+        List<String> firewalls = new ArrayList<String>();
+        for( ServerGroup serverGroup : globalServerGroups ) {
+            if( vmServerGroups.contains(serverGroup) ) {
+                firewalls.add(serverGroup.getFirewallPolicy().getId());
+            }
+        }
+        vm.setProviderFirewallIds(firewalls.toArray(new String[firewalls.size()]));
         vm.setPlatform(Platform.guess(vm.getName()));
-        if( vm.getPlatform() == null ) {
+        if( vm.getPlatform() == Platform.UNKNOWN ) {
             vm.setPlatform(Platform.guess(server.getImage().getName()));
         }
-        if( vm.getPlatform() == null ) {
+        if( vm.getPlatform() == Platform.UNKNOWN ) {
             vm.setPlatform(Platform.guess(server.getImage().getDescription()));
         }
-        if( vm.getPlatform() == null ) {
+        if( vm.getPlatform() == Platform.UNKNOWN ) {
             vm.setPlatform(Platform.guess(server.getImage().getSource()));
         }
         vm.setCurrentState(toVmState(server.getStatus()));
@@ -232,6 +263,16 @@ public class BrightBoxVmSupport extends AbstractVMSupport<BrightBoxCloud> {
 
     @Override
     public void terminate(@Nonnull String vmId, @Nullable String explanation) throws InternalException, CloudException {
+        Server server = getProvider().getCloudApiService().getServer(vmId);
+        for( ServerGroup group : server.getServerGroups() ) {
+            try {
+                getProvider().getCloudApiService().removeServersFromGroup(group.getId(), Collections.singletonList(new ServerGroupServer(vmId)));
+            } catch (CloudException e) {
+                if( e.getHttpCode() != 404 ) {
+                    throw e;
+                }
+            }
+        }
         getProvider().getCloudApiService().deleteServer(vmId);
     }
 }

@@ -59,8 +59,15 @@ public class BrightBoxMachineImageSupport extends AbstractImageSupport<BrightBox
 
     @Override
     public @Nullable MachineImage getImage(@Nonnull String providerImageId) throws CloudException, InternalException {
-        Image image = getProvider().getCloudApiService().getImage(providerImageId);
-        return toMachineImage(image);
+        try {
+            Image image = getProvider().getCloudApiService().getImage(providerImageId);
+            return toMachineImage(image);
+        } catch (CloudException e) {
+            if( e.getHttpCode() == 404 ) {
+                return null;
+            }
+            throw e;
+        }
     }
 
     @Override
@@ -97,6 +104,15 @@ public class BrightBoxMachineImageSupport extends AbstractImageSupport<BrightBox
             }
         }
         return results;
+    }
+
+    @Override
+    public boolean isImageSharedWithPublic(@Nonnull String providerImageId) throws CloudException, InternalException {
+        MachineImage image = getImage(providerImageId);
+        if( image != null ) {
+            return image.isPublic();
+        }
+        return false;
     }
 
     /**

@@ -20,6 +20,8 @@ package org.dasein.cloud.brightbox.api.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import javax.annotation.Nonnull;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -93,7 +95,10 @@ public class FirewallPolicy {
         this.serverGroup = serverGroup;
     }
 
-    public List<FirewallRule> getRules() {
+    public @Nonnull List<FirewallRule> getRules() {
+        if( rules == null ) {
+            rules = new ArrayList<FirewallRule>();
+        }
         return rules;
     }
 

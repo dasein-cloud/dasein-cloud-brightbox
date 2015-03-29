@@ -75,8 +75,11 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
     private volatile transient List<RuleTargetType> destinations;
     @Override
     public @Nonnull Iterable<RuleTargetType> listSupportedDestinationTypes(boolean inVlan) throws InternalException, CloudException {
+        if( inVlan ) {
+            return Collections.emptyList();
+        }
         if( destinations == null ) {
-            destinations = Collections.unmodifiableList(Arrays.asList(RuleTargetType.CIDR, RuleTargetType.VM));
+            destinations = Collections.unmodifiableList(Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM));
         }
         return destinations;
     }
@@ -85,8 +88,11 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
 
     @Override
     public @Nonnull Iterable<Direction> listSupportedDirections(boolean inVlan) throws InternalException, CloudException {
+        if( inVlan ) {
+            return Collections.emptyList();
+        }
         if( directions == null ) {
-            directions = Collections.unmodifiableList(Arrays.asList(Direction.INGRESS));
+            directions = Collections.unmodifiableList(Arrays.asList(Direction.INGRESS, Direction.EGRESS));
         }
         return directions;
     }
@@ -95,6 +101,9 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
 
     @Override
     public @Nonnull Iterable<Permission> listSupportedPermissions(boolean inVlan) throws InternalException, CloudException {
+        if( inVlan ) {
+            return Collections.emptyList();
+        }
         if( permissions == null ) {
             permissions = Collections.unmodifiableList(Collections.singletonList(Permission.ALLOW));
         }
@@ -105,6 +114,9 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
 
     @Override
     public @Nonnull Iterable<Protocol> listSupportedProtocols(boolean inVlan) throws InternalException, CloudException {
+        if( inVlan ) {
+            return Collections.emptyList();
+        }
         if( protocols == null ) {
             protocols = Collections.unmodifiableList(Arrays.asList(Protocol.TCP, Protocol.ICMP, Protocol.UDP));
         }
@@ -115,6 +127,9 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
 
     @Override
     public @Nonnull Iterable<RuleTargetType> listSupportedSourceTypes(boolean inVlan) throws InternalException, CloudException {
+        if( inVlan ) {
+            return Collections.emptyList();
+        }
         if( sourceTypes == null ) {
             sourceTypes = Collections.unmodifiableList(Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM));
         }
@@ -133,7 +148,7 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
 
     @Override
     public boolean supportsRules(@Nonnull Direction direction, @Nonnull Permission permission, boolean inVlan) throws CloudException, InternalException {
-        return false;
+        return !inVlan && Permission.ALLOW.equals(permission);
     }
 
     @Override
