@@ -219,7 +219,7 @@ LoadBalancerAddressType.IP, lb.getUrl(), lb.getId(), ports).withListeners(listen
 //        .operatingIn(dataCenters.keySet().toArray(new String[dataCenters.size()]));
     }
 
-    private DataCenter toDataCenter(Zone zone) throws CloudException {
+    private DataCenter toDataCenter(Zone zone) throws CloudException, InternalException {
         return new DataCenter(zone.getId(), zone.getHandle(), getContext().getRegionId(), true, true);
     };
 

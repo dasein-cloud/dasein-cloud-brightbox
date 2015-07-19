@@ -29,6 +29,7 @@ import org.dasein.cloud.compute.ImageClass;
 import org.dasein.cloud.compute.MachineImageFormat;
 import org.dasein.cloud.compute.MachineImageType;
 import org.dasein.cloud.compute.VmState;
+import org.dasein.cloud.util.NamingConstraints;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -127,5 +128,16 @@ public class BrightBoxImageCapabilities extends AbstractCapabilities<BrightBoxCl
     @Override
     public boolean supportsPublicLibrary(@Nonnull ImageClass cls) throws CloudException, InternalException {
         return cls.equals(ImageClass.MACHINE);
+    }
+
+    @Override
+    public boolean imageCaptureDestroysVM() throws CloudException, InternalException {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    public NamingConstraints getImageNamingConstraints() throws CloudException, InternalException {
+        return NamingConstraints.getAlphaNumeric(0, 255);
     }
 }

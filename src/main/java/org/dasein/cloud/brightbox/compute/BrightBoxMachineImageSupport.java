@@ -157,7 +157,7 @@ public class BrightBoxMachineImageSupport extends AbstractImageSupport<BrightBox
      * @return
      * @throws CloudException
      */
-    private MachineImage toMachineImage(Image image) throws CloudException {
+    private MachineImage toMachineImage(Image image) throws CloudException, InternalException {
         MachineImageState state = toState(image.getStatus());
         if( state == null ) {
             return null; // state is unsupported

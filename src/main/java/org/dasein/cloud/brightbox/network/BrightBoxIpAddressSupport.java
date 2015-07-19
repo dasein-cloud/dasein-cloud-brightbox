@@ -139,7 +139,7 @@ public class BrightBoxIpAddressSupport extends AbstractIpAddressSupport<BrightBo
         return ipAddresses;
     }
 
-    private IpAddress toIpAddress(CloudIp cloudIp) throws CloudException {
+    private IpAddress toIpAddress(CloudIp cloudIp) throws CloudException, InternalException {
         IpAddress ipAddress = new IpAddress();
         ipAddress.setAddress(cloudIp.getPublicIp());
         ipAddress.setIpAddressId(cloudIp.getId());

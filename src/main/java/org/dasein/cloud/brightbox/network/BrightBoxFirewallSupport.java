@@ -313,7 +313,7 @@ public class BrightBoxFirewallSupport extends AbstractFirewallSupport<BrightBoxC
         return FirewallRule.getInstance(rule.getId(), firewallId, source, direction, protocol, Permission.ALLOW, destination, startPort, endPort);
     }
 
-    private @Nullable Firewall toFirewall(@Nullable FirewallPolicy firewallPolicy) throws CloudException {
+    private @Nullable Firewall toFirewall(@Nullable FirewallPolicy firewallPolicy) throws InternalException, CloudException {
         if( firewallPolicy == null ) {
             return null;
         }

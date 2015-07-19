@@ -56,6 +56,12 @@ public class BrightBoxIpAddressCapabilities extends AbstractCapabilities<BrightB
         return Requirement.NONE;
     }
 
+    @Nonnull
+    @Override
+    public Requirement identifyVMForPortForwarding() throws CloudException, InternalException {
+        return Requirement.NONE;
+    }
+
     @Override
     public boolean isAssigned(@Nonnull IPVersion version) throws CloudException, InternalException {
         return IPVersion.IPV4.equals(version);

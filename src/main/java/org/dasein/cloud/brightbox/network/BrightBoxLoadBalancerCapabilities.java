@@ -31,6 +31,7 @@ import org.dasein.cloud.network.LbPersistence;
 import org.dasein.cloud.network.LbProtocol;
 import org.dasein.cloud.network.LoadBalancerAddressType;
 import org.dasein.cloud.network.LoadBalancerCapabilities;
+import org.dasein.cloud.util.NamingConstraints;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -71,6 +72,11 @@ public class BrightBoxLoadBalancerCapabilities extends AbstractCapabilities<Brig
     @Override
     public boolean healthCheckRequiresLoadBalancer() throws CloudException, InternalException {
         return true;
+    }
+
+    @Override
+    public boolean healthCheckRequiresListener() throws CloudException, InternalException {
+        return false;
     }
 
     @Override
@@ -173,5 +179,16 @@ public class BrightBoxLoadBalancerCapabilities extends AbstractCapabilities<Brig
     @Override
     public boolean supportsMultipleTrafficTypes() throws CloudException, InternalException {
         return false;
+    }
+
+    @Override
+    public boolean supportsSslCertificateStore() throws CloudException, InternalException {
+        return false;
+    }
+
+    @Nonnull
+    @Override
+    public NamingConstraints getLoadBalancerNamingConstraints() throws CloudException, InternalException {
+        return NamingConstraints.getAlphaNumeric(0, 255);
     }
 }

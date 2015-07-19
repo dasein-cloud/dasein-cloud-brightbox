@@ -30,6 +30,7 @@ import org.dasein.cloud.network.FirewallConstraints;
 import org.dasein.cloud.network.Permission;
 import org.dasein.cloud.network.Protocol;
 import org.dasein.cloud.network.RuleTargetType;
+import org.dasein.cloud.util.NamingConstraints;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -72,16 +73,18 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
         return false;
     }
 
-    private volatile transient List<RuleTargetType> destinations;
     @Override
+    @Deprecated
     public @Nonnull Iterable<RuleTargetType> listSupportedDestinationTypes(boolean inVlan) throws InternalException, CloudException {
-        if( inVlan ) {
-            return Collections.emptyList();
+        throw new RuntimeException("listSupportedDestinationTypes(boolean) is deprecated");
+    }
+
+    @Override
+    public @Nonnull Iterable<RuleTargetType> listSupportedDestinationTypes(boolean inVlan, Direction direction) throws InternalException, CloudException {
+        if( Direction.EGRESS.equals(direction) && !inVlan ) {
+            return Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM);
         }
-        if( destinations == null ) {
-            destinations = Collections.unmodifiableList(Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM));
-        }
-        return destinations;
+        return Collections.emptyList();
     }
 
     private volatile transient List<Direction> directions;
@@ -126,14 +129,17 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
     private volatile transient List<RuleTargetType> sourceTypes;
 
     @Override
+    @Deprecated
     public @Nonnull Iterable<RuleTargetType> listSupportedSourceTypes(boolean inVlan) throws InternalException, CloudException {
-        if( inVlan ) {
-            return Collections.emptyList();
+        throw new RuntimeException("listSupportedSourceTypes(boolean) is deprecated");
+    }
+
+    @Override
+    public @Nonnull Iterable<RuleTargetType> listSupportedSourceTypes(boolean inVlan, Direction direction) throws InternalException, CloudException {
+        if( Direction.INGRESS.equals(direction) && !inVlan ) {
+            return Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM);
         }
-        if( sourceTypes == null ) {
-            sourceTypes = Collections.unmodifiableList(Arrays.asList(RuleTargetType.GLOBAL, RuleTargetType.CIDR, RuleTargetType.VM));
-        }
-        return sourceTypes;
+        return Collections.emptyList();
     }
 
     @Override
@@ -159,5 +165,11 @@ public class BrightBoxFirewallCapabilities extends AbstractCapabilities<BrightBo
     @Override
     public boolean supportsFirewallDeletion() throws CloudException, InternalException {
         return true;
+    }
+
+    @Nonnull
+    @Override
+    public NamingConstraints getFirewallNamingConstraints() throws CloudException, InternalException {
+        return NamingConstraints.getAlphaNumeric(0, 255);
     }
 }

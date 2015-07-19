@@ -217,6 +217,16 @@ public class BrightBoxVmCapabilities extends AbstractCapabilities<BrightBoxCloud
     }
 
     @Override
+    public boolean supportsCloudStoredShellKey() throws InternalException, CloudException {
+        return false;
+    }
+
+    @Override
+    public boolean isVMProductDCConstrained() throws InternalException, CloudException {
+        return false;
+    }
+
+    @Override
     public boolean supportsAlterVM() {
         return false;
     }

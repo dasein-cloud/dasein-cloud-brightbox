@@ -29,25 +29,23 @@ import javax.annotation.Nullable;
 /**
  * Created by stas on 13/02/2015.
  */
-public class BrightBoxNetworkServices extends AbstractNetworkServices {
-    private BrightBoxCloud provider;
-
+public class BrightBoxNetworkServices extends AbstractNetworkServices<BrightBoxCloud> {
     public BrightBoxNetworkServices(BrightBoxCloud brightBoxCloud) {
-        provider = brightBoxCloud;
+        super(brightBoxCloud);
     }
 
     @Override
     public @Nullable LoadBalancerSupport getLoadBalancerSupport() {
-        return new BrightBoxLoadBalancerSupport(provider);
+        return new BrightBoxLoadBalancerSupport(getProvider());
     }
 
     @Override
     public @Nullable IpAddressSupport getIpAddressSupport() {
-        return new BrightBoxIpAddressSupport(provider);
+        return new BrightBoxIpAddressSupport(getProvider());
     }
 
     @Override
     public @Nullable FirewallSupport getFirewallSupport() {
-        return new BrightBoxFirewallSupport(provider);
+        return new BrightBoxFirewallSupport(getProvider());
     }
 }
